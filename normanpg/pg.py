@@ -8,16 +8,14 @@
 
 This module needs a description.
 """
-from datetime import datetime
 import inspect
 import logging
-from typing import Any, Iterable, List, Generator, Union, Set, Tuple
+from typing import Any, Iterable, Union
 from urllib.parse import urlparse, ParseResult
-from functools import lru_cache
 import psycopg2.extras
 import psycopg2.sql
 import psycopg2.extensions
-from .errors import NormanPgException
+
 
 __logger__ = logging.getLogger(__name__)  #: the module logger
 
@@ -66,9 +64,9 @@ def connect(
 
 
 def _execute_scalar(
-    cnx,
-    query: psycopg2.sql.Composed,
-    caller: str
+        cnx,
+        query: psycopg2.sql.Composed,
+        caller: str
 ) -> Any:
     """
     This is a helper function for :py:func:`execute_scalar` that executes a
@@ -125,9 +123,9 @@ def execute_scalar(
 
 
 def _execute_rows(
-    cnx,
-    query: psycopg2.sql.Composed,
-    caller: str
+        cnx,
+        query: psycopg2.sql.Composed,
+        caller: str
 ) -> Iterable[psycopg2.extras.DictRow]:
     """
     This is a helper function for :py:func:`execute_rows` that executes a
@@ -187,9 +185,9 @@ def execute_rows(
 
 
 def _execute(
-    cnx,
-    query: psycopg2.sql.Composed,
-    caller: str
+        cnx,
+        query: psycopg2.sql.Composed,
+        caller: str
 ):
     """
     This is a helper function for :py:func:`execute` that executes a
