@@ -138,7 +138,7 @@ def _execute_rows(
     :param caller: identifies the call stack location
     :return: an iteration of `DictRow` instances representing the rows
     """
-    with cnx.cursor() as crs:
+    with cnx.cursor(cursor_factory=psycopg2.extras.DictCursor) as crs:
         # Log the query.
         __logger__.debug(f'[{caller}] {query.as_string(crs)}')
         # Execute!

@@ -52,7 +52,8 @@ setup(
         # 'numpy>=1.13.3,<2',
         # 'measurement>=1.8.0,<2'
         'click>=7.0,<8',
-        'psycopg2-binary>=2.7.4,<3'
+        'psycopg2-binary>=2.7.4,<3',
+        'shapely[vectorized]'
     ],
     entry_points="""
     [console_scripts]
