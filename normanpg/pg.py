@@ -82,14 +82,18 @@ def _execute_scalar(
         # Log the query.
         __logger__.debug(f'[{caller}] {query.as_string(crs)}')
         # Execute!
-        crs.execute(query)
+        try:
+            crs.execute(query)
+        except SyntaxError:
+            logging.exception(query.as_string(crs))
+            raise
         # Get the first column from the first result.
         return crs.fetchone()[0]
 
 
 def execute_scalar(
         cnx,
-        query: psycopg2.sql.Composed,
+        query: Union[str, psycopg2.sql.Composed],
         caller: str = None
 ) -> Any or None:
     """
@@ -104,14 +108,20 @@ def execute_scalar(
     # Get the name of the calling function so we can include it in the logging
     # statement.
     caller = caller if caller else inspect.stack()[1][3]
+    # Make sure the query is `Composed`.
+    _query = (
+        psycopg2.sql.SQL(query).format()
+        if isinstance(query, str)
+        else query
+    )
     # If the caller passed us a connection string...
     if isinstance(cnx, str):
         # ...get a connection and use the helper method to execute the query.
         with connect(url=cnx) as _cnx:
-            return _execute_scalar(cnx=_cnx, query=query, caller=caller)
+            return _execute_scalar(cnx=_cnx, query=_query, caller=caller)
     # It looks as though we were given an open connection, so execute the
     # query on it.
-    return _execute_scalar(cnx=cnx, query=query, caller=caller)
+    return _execute_scalar(cnx=cnx, query=_query, caller=caller)
 
 
 def _execute_rows(
@@ -132,7 +142,11 @@ def _execute_rows(
         # Log the query.
         __logger__.debug(f'[{caller}] {query.as_string(crs)}')
         # Execute!
-        crs.execute(query)
+        try:
+            crs.execute(query)
+        except SyntaxError:
+            logging.exception(query.as_string(crs))
+            raise
         # Fetch the rows and yield them to the caller.
         for row in crs:
             yield row
@@ -140,7 +154,7 @@ def _execute_rows(
 
 def execute_rows(
         cnx,
-        query: psycopg2.sql.Composed,
+        query: Union[str, psycopg2.sql.Composed],
         caller: str = None
 ) -> Iterable[psycopg2.extras.DictRow]:
     """
@@ -154,13 +168,79 @@ def execute_rows(
     # Get the name of the calling function so we can include it in the logging
     # statement.
     caller = caller if caller else inspect.stack()[1][3]
+    # Make sure the query is `Composed`.
+    _query = (
+        psycopg2.sql.SQL(query).format()
+        if isinstance(query, str)
+        else query
+    )
     # If the caller passed us a connection string...
     if isinstance(cnx, str):
         # ...get a connection and use the helper method to execute the query.
         with connect(url=cnx) as _cnx:
-            for row in _execute_rows(cnx=_cnx, query=query, caller=caller):
+            for row in _execute_rows(cnx=_cnx, query=_query, caller=caller):
                 yield row
     # It looks as though we were given an open connection, so execute the
     # query on it.
-    for row in _execute_rows(cnx=_cnx, query=query, caller=caller):
+    for row in _execute_rows(cnx=_cnx, query=_query, caller=caller):
         yield row
+
+
+def _execute(
+    cnx,
+    query: psycopg2.sql.Composed,
+    caller: str
+):
+    """
+    This is a helper function for :py:func:`execute` that executes a
+    query on an open cursor.
+
+    :param cnx: an open connection or database connection string
+    :param query: the query
+    :param caller: identifies the call stack location
+    """
+    with cnx.cursor() as crs:
+        # Log the query.
+        __logger__.debug(f'[{caller}] {query.as_string(crs)}')
+        # Execute!
+        try:
+            crs.execute(query)
+        except SyntaxError:
+            logging.exception(query.as_string(crs))
+            raise
+
+
+def execute(
+        cnx,
+        query: Union[str, psycopg2.sql.Composed],
+        caller: str = None
+):
+    """
+    Execute a query that returns no result.
+
+    :param cnx: an open connection or database connection string
+    :param query: the `psycopg2` composed query
+    :param caller: identifies the caller (for diagnostics)
+
+    .. seelaso::
+
+        * :py:func:`execute_scalar`
+        * :py:func:`execute_rows`
+    """
+    # Get the name of the calling function so we can include it in the logging
+    # statement.
+    caller = caller if caller else inspect.stack()[1][3]
+    # Make sure the query is `Composed`.
+    _query = (
+        psycopg2.sql.SQL(query).format()
+        if isinstance(query, str)
+        else query
+    )
+    # If the caller passed us a connection string...
+    if isinstance(cnx, str):
+        # ...get a connection and use the helper method to execute the query.
+        with connect(url=cnx) as _cnx:
+            _execute(cnx=_cnx, query=_query, caller=caller)
+    # It looks as though we were given an open connection, so execute the
+    # query on it.
+    _execute(cnx=_cnx, query=_query, caller=caller)
