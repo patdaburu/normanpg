@@ -12,7 +12,7 @@ from shapely.geometry.base import BaseGeometry
 from shapely import wkb
 
 
-def geometry(obj: str) -> BaseGeometry:
+def shape(obj: str) -> BaseGeometry:
     """
     Convert a geometry from Postgres into a
     `Shapely <https://shapely.readthedocs.io/en/stable/manual.html#geometric-objects>`_
