@@ -10,4 +10,5 @@ Examples
    :maxdepth: 2
    :caption: Contents:
 
-   examples/execute_rows.rst
+   examples/execute_rows
+   examples/shared_connection

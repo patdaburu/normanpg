@@ -180,7 +180,7 @@ def execute_rows(
                 yield row
     # It looks as though we were given an open connection, so execute the
     # query on it.
-    for row in _execute_rows(cnx=_cnx, query=_query, caller=caller):
+    for row in _execute_rows(cnx=cnx, query=_query, caller=caller):
         yield row
 
 
@@ -241,4 +241,4 @@ def execute(
             _execute(cnx=_cnx, query=_query, caller=caller)
     # It looks as though we were given an open connection, so execute the
     # query on it.
-    _execute(cnx=_cnx, query=_query, caller=caller)
+    _execute(cnx=cnx, query=_query, caller=caller)
