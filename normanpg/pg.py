@@ -26,7 +26,7 @@ def connect(
         url: str,
         dbname: str = None,
         autocommit: bool = False
-):
+) -> psycopg2.extensions.connection:
     """
     Get a connection to a Postgres database instance.
 
@@ -64,7 +64,7 @@ def connect(
 
 
 def _execute_scalar(
-        cnx,
+        cnx: psycopg2.extensions.connection,
         query: psycopg2.sql.Composed,
         caller: str
 ) -> Any:
@@ -90,7 +90,7 @@ def _execute_scalar(
 
 
 def execute_scalar(
-        cnx,
+        cnx: Union[str, psycopg2.extensions.connection],
         query: Union[str, psycopg2.sql.Composed],
         caller: str = None
 ) -> Any or None:
@@ -123,7 +123,7 @@ def execute_scalar(
 
 
 def _execute_rows(
-        cnx,
+        cnx: psycopg2.extensions.connection,
         query: psycopg2.sql.Composed,
         caller: str
 ) -> Iterable[psycopg2.extras.DictRow]:
@@ -151,7 +151,7 @@ def _execute_rows(
 
 
 def execute_rows(
-        cnx,
+        cnx: Union[str, psycopg2.extensions.connection],
         query: Union[str, psycopg2.sql.Composed],
         caller: str = None
 ) -> Iterable[psycopg2.extras.DictRow]:
@@ -185,7 +185,7 @@ def execute_rows(
 
 
 def _execute(
-        cnx,
+        cnx: psycopg2.extensions.connection,
         query: psycopg2.sql.Composed,
         caller: str
 ):
@@ -209,7 +209,7 @@ def _execute(
 
 
 def execute(
-        cnx,
+        cnx: Union[str, psycopg2.extensions.connection],
         query: Union[str, psycopg2.sql.Composed],
         caller: str = None
 ):
@@ -220,7 +220,7 @@ def execute(
     :param query: the `psycopg2` composed query
     :param caller: identifies the caller (for diagnostics)
 
-    .. seelaso::
+    .. seealso::
 
         * :py:func:`execute_scalar`
         * :py:func:`execute_rows`
