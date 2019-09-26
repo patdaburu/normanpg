@@ -3,6 +3,21 @@
 Fetching Rows With Geometry
 ===========================
 
+In this example, we'll fetch some data from a table in the database using the
+:py:func:`execute_rows <normanpg.pg.execute_rows>` function.  The table also
+has a geometry (in a column called ``the_geom``).  We'll use the
+:py:func:`shape <normanpg.geometry.shape>` function to convert the
+`WKB <https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary>`_
+returned by the database into a
+`Shapely <https://shapely.readthedocs.io/en/stable/manual.html#points>`_ point
+geometry.
+
+.. note::
+
+    Obviously, your data may vary.  The table we're pulling from in this example
+    came from sample data referenced in the
+    `PostGIS Cookbook <https://www.packtpub.com/application-development/postgis-cookbook-second-edition>`_.
+
 .. code-block:: python
 
     from normanpg import execute_rows
