@@ -8,5 +8,5 @@
 This is a set of modest utilities that may be helpful when talking to
 PostgreSQL.
 """
-from .pg import execute, execute_rows, execute_scalar
+from .pg import connect, execute, execute_rows, execute_scalar
 from .version import __version__, __release__
