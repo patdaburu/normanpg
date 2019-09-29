@@ -1,0 +1,1 @@
+SELECT FIND_SRID({schema}, {table}, {geomcol})

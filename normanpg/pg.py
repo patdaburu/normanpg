@@ -14,6 +14,7 @@ from typing import Any, Iterable, Union
 from urllib.parse import urlparse, ParseResult
 import psycopg2.extras
 import psycopg2.sql
+from psycopg2.sql import SQL
 import psycopg2.extensions
 
 
@@ -242,3 +243,23 @@ def execute(
     # It looks as though we were given an open connection, so execute the
     # query on it.
     _execute(cnx=cnx, query=_query, caller=caller)
+
+
+def compose_table(
+        table_name: str,
+        schema_name: str = None
+) -> psycopg2.sql.Composed:
+    """
+    Get a composed SQL object for a fully-qualified table name.
+
+    :param table_name: the table name
+    :param schema_name: the schema name
+    :return: a composed SQL object
+    """
+    if schema_name is not None:
+        return psycopg2.sql.SQL('{}.{}').format(
+            SQL(schema_name),
+            SQL(table_name)
+        )
+    else:
+        return SQL('{}').format(SQL(table_name))
