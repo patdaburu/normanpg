@@ -40,6 +40,18 @@ class NoGeometryColumn(NormanPgException):
     """
 
 
+def table_exists(
+        cnx: Union[str, psycopg2.extensions.connection],
+        table_name: str,
+        schema_name: str
+) -> bool:
+    query = SQL(_phrasebook.gets('table_exists')).format(
+        table=Literal(table_name),
+        schema=Literal(schema_name)
+    )
+    return execute_scalar(cnx=cnx,query=query)
+
+
 def geometry_column(
         cnx: Union[str, psycopg2.extensions.connection],
         table_name: str,

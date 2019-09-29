@@ -8,4 +8,4 @@
 
 Within this package are handy functions.
 """
-from .table_info import geometry_column, srid
+from .table_info import geometry_column, srid, table_exists
