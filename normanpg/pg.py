@@ -109,7 +109,7 @@ def execute_scalar(
     caller = caller if caller else inspect.stack()[1][3]
     # Make sure the query is `Composed`.
     _query = (
-        psycopg2.sql.SQL(query).format()
+        psycopg2.sql.SQL(query).string
         if isinstance(query, str)
         else query
     )
@@ -169,7 +169,7 @@ def execute_rows(
     caller = caller if caller else inspect.stack()[1][3]
     # Make sure the query is `Composed`.
     _query = (
-        psycopg2.sql.SQL(query).format()
+        psycopg2.sql.SQL(query).string
         if isinstance(query, str)
         else query
     )
@@ -231,7 +231,7 @@ def execute(
     caller = caller if caller else inspect.stack()[1][3]
     # Make sure the query is `Composed`.
     _query = (
-        psycopg2.sql.SQL(query).format()
+        psycopg2.sql.SQL(query).string
         if isinstance(query, str)
         else query
     )
