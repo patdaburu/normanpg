@@ -31,7 +31,7 @@ class InvalidDbResult(NormanPgException):
     """
 
 
-def _log_query(
+def log_query(
         crs: psycopg2.extensions.cursor,
         caller: str,
         query: str or psycopg2.sql.Composed
@@ -103,7 +103,7 @@ def _execute_scalar(
     """
     with cnx.cursor() as crs:
         # Log the query.
-        _log_query(crs=crs, caller=caller, query=query)
+        log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -163,7 +163,7 @@ def _execute_rows(
     """
     with cnx.cursor(cursor_factory=psycopg2.extras.DictCursor) as crs:
         # Log the query.
-        _log_query(crs=crs, caller=caller, query=query)
+        log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -224,7 +224,7 @@ def _execute(
     """
     with cnx.cursor() as crs:
         # Log the query.
-        _log_query(crs=crs, caller=caller, query=query)
+        log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)

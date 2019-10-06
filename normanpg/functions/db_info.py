@@ -8,14 +8,16 @@
 
 This module contains database-level functions.
 """
+import inspect
 from typing import Union
 from urllib.parse import urlparse, ParseResult
 from phrasebook import SqlPhrasebook
 import psycopg2.extensions
-from psycopg2.sql import SQL, Literal
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from psycopg2.sql import Literal, Identifier, SQL
 from ..errors import NormanPgException
 from ..pg import (
-    connect, execute_rows, execute_scalar,
+    connect, execute, execute_rows, execute_scalar,
     InvalidDbResult,
     DEFAULT_ADMIN_DB, DEFAULT_PG_PORT
 )
@@ -77,56 +79,51 @@ def db_exists(
         return count == 1
 
 
+def create_db(
+        url: str,
+        dbname: str,
+        admindb: str = DEFAULT_ADMIN_DB
+):
+    """
+    Create a database on a Postgres instance.
 
-# def create_db(
-#         url: str,
-#         dbname: str,
-#         admindb: str = DEFAULT_ADMIN_DB):
-#     """
-#     Create a database on a Postgres instance.
-#
-#     :param url: the Postgres instance URL
-#     :param dbname: the name of the database
-#     :param admindb: the name of an existing (presumably the main) database
-#     """
-#     try:
-#         with connect(url=url, dbname=admindb) as cnx:
-#             cnx.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-#             with cnx.cursor() as crs:
-#                 crs.execute(_sql_phrasebook.create_db.format(dbname))
-#     except (psycopg2.IntegrityError, exc.IntegrityError) as pex:
-#         # Let's examine the error coming back from trying to create the DB.
-#         err_msg = str(pex)
-#         if (
-#                 f'DETAIL:  Key (datname)=({dbname}) already exists' in err_msg
-#                 or pex.pgcode == 23505
-#         ):
-#             pass
-#         else:
-#             raise
-#
-#
-# def touch_db(
-#         url: str,
-#         dbname: str = None,
-#         admindb: str = DEFAULT_ADMIN_DB):
-#     """
-#     Create a database if it does not already exist.
-#
-#     :param url: the Postgres instance URL
-#     :param dbname: the name of the database
-#     :param admindb: the name of an existing (presumably the main) database
-#     """
-#     # If the database already exists, we don't need to do anything further.
-#     if db_exists(url=url, dbname=dbname, admindb=admindb):
-#         return
-#     # Let's see what we got for the database name.
-#     _dbname = dbname
-#     # If the caller didn't specify a database name...
-#     if not _dbname:
-#         # ...let's figure it out from the URL.
-#         db: ParseResult = urlparse(url)
-#         _dbname = db.path[1:]
-#
-#     # Now we can create it.
-#     create_db(url=url, dbname=_dbname, admindb=admindb)
+    :param url: the database URL
+    :param dbname: the name of the database
+    :param admindb: the name of an existing (presumably the main) database
+    """
+    # Figure out what database we're looking for.
+    _dbname = dbname if dbname else parse_dbname(url)
+    # Construct the query.
+    query = SQL(_PHRASEBOOK.gets('create_db')).format(
+        dbname=Identifier(_dbname)
+    )
+    # Let's create the database.
+    with connect(url=url, dbname=admindb) as cnx:
+        cnx.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        try:
+            execute(cnx=cnx, query=query)
+        except psycopg2.IntegrityError as pex:
+            raise
+
+
+def touch_db(
+        url: str,
+        dbname: str = None,
+        admindb: str = DEFAULT_ADMIN_DB
+):
+    """
+    Create a database if it does not already exist.
+
+    :param url: the database URL
+    :param dbname: the name of the database
+    :param admindb: the name of an existing (presumably the main) database
+    """
+    # If the database already exists, we don't need to do anything further.
+    if db_exists(url=url, dbname=dbname, admindb=admindb):
+        return
+
+    # Let's see what we got for the database name.
+    _dbname = dbname if dbname else parse_dbname(url)
+
+    # Now we can create it.
+    create_db(url=url, dbname=_dbname, admindb=admindb)

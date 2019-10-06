@@ -8,5 +8,5 @@
 
 Within this package are handy functions.
 """
-from .db_info import db_exists, parse_dbname
+from .db_info import create_db, db_exists, parse_dbname, touch_db
 from .table_info import geometry_column, srid, table_exists
