@@ -14,12 +14,29 @@ from typing import Any, Iterable, Union
 from urllib.parse import urlparse, ParseResult
 import psycopg2.extras
 import psycopg2.sql
+from psycopg2.sql import SQL
 import psycopg2.extensions
 
 
 __logger__ = logging.getLogger(__name__)  #: the module logger
 
 DEFAULT_PG_PORT: int = 5432  #: the default Postgres database port
+
+
+def _log_query(
+        crs: psycopg2.extensions.cursor,
+        caller: str,
+        query: str or psycopg2.sql.Composed
+):
+    """
+    Log a SQL query.
+
+    :param crs: the execution cursor
+    :param caller: the caller
+    :param query: the query
+    """
+    query_str = query if isinstance(query, str) else query.as_string(crs)
+    __logger__.debug(f'[{caller}] {query_str}')
 
 
 def connect(
@@ -78,7 +95,7 @@ def _execute_scalar(
     """
     with cnx.cursor() as crs:
         # Log the query.
-        __logger__.debug(f'[{caller}] {query.as_string(crs)}')
+        _log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -108,7 +125,7 @@ def execute_scalar(
     caller = caller if caller else inspect.stack()[1][3]
     # Make sure the query is `Composed`.
     _query = (
-        psycopg2.sql.SQL(query).format()
+        psycopg2.sql.SQL(query).string
         if isinstance(query, str)
         else query
     )
@@ -138,7 +155,7 @@ def _execute_rows(
     """
     with cnx.cursor(cursor_factory=psycopg2.extras.DictCursor) as crs:
         # Log the query.
-        __logger__.debug(f'[{caller}] {query.as_string(crs)}')
+        _log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -168,7 +185,7 @@ def execute_rows(
     caller = caller if caller else inspect.stack()[1][3]
     # Make sure the query is `Composed`.
     _query = (
-        psycopg2.sql.SQL(query).format()
+        psycopg2.sql.SQL(query).string
         if isinstance(query, str)
         else query
     )
@@ -199,7 +216,7 @@ def _execute(
     """
     with cnx.cursor() as crs:
         # Log the query.
-        __logger__.debug(f'[{caller}] {query.as_string(crs)}')
+        _log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -230,7 +247,7 @@ def execute(
     caller = caller if caller else inspect.stack()[1][3]
     # Make sure the query is `Composed`.
     _query = (
-        psycopg2.sql.SQL(query).format()
+        psycopg2.sql.SQL(query).string
         if isinstance(query, str)
         else query
     )
@@ -242,3 +259,23 @@ def execute(
     # It looks as though we were given an open connection, so execute the
     # query on it.
     _execute(cnx=cnx, query=_query, caller=caller)
+
+
+def compose_table(
+        table_name: str,
+        schema_name: str = None
+) -> psycopg2.sql.Composed:
+    """
+    Get a composed SQL object for a fully-qualified table name.
+
+    :param table_name: the table name
+    :param schema_name: the schema name
+    :return: a composed SQL object
+    """
+    if schema_name is not None:
+        return psycopg2.sql.SQL('{}.{}').format(
+            SQL(schema_name),
+            SQL(table_name)
+        )
+    else:
+        return SQL('{}').format(SQL(table_name))
