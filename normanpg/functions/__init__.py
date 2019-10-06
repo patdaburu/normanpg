@@ -11,6 +11,7 @@ Within this package are handy functions.
 from .db_info import (
     create_db,
     create_extension,
+    create_schema,
     db_exists,
     parse_dbname,
     touch_db

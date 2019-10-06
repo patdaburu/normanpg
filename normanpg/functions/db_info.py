@@ -150,3 +150,26 @@ def touch_db(
 
     # Now we can create it.
     create_db(url=url, dbname=_dbname, admindb=admindb)
+
+
+def create_schema(
+        url: str,
+        schema: str,
+        dbname: str = None
+):
+    """
+    Create a schema in the database.
+
+    :param url: the database URL
+    :param schema: the name of the schema
+    :param dbname: the name of the database
+    """
+    # Figure out what database we're looking for.
+    _dbname = dbname if dbname else parse_dbname(url)
+    # Construct the query.
+    query = SQL(_PHRASEBOOK.gets('create_schema')).format(
+        schema=SQL(schema)
+    )
+    # Create the schema.
+    with connect(url=url, dbname=dbname) as cnx:
+        execute(cnx=cnx, query=query)
