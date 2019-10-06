@@ -106,6 +106,29 @@ def create_db(
             raise
 
 
+def create_extension(
+        url: str,
+        extension: str,
+        dbname: str = None
+):
+    """
+    Create (install) an extension in a database.
+
+    :param url: the database URL
+    :param extension: the name of an existing (presumably the main) database
+    :param dbname: the name of the database
+    """
+    # Figure out what database we're looking for.
+    _dbname = dbname if dbname else parse_dbname(url)
+    # Construct the query.
+    query = SQL(_PHRASEBOOK.gets('create_extension')).format(
+        extension=SQL(extension)
+    )
+    # Create the extension.
+    with connect(url=url, dbname=dbname) as cnx:
+        execute(cnx=cnx, query=query)
+
+
 def touch_db(
         url: str,
         dbname: str = None,
