@@ -16,11 +16,19 @@ import psycopg2.extras
 import psycopg2.sql
 from psycopg2.sql import SQL
 import psycopg2.extensions
+from .errors import NormanPgException
 
 
 __logger__ = logging.getLogger(__name__)  #: the module logger
 
+DEFAULT_ADMIN_DB = 'postgres'  #: the default administrative database name
 DEFAULT_PG_PORT: int = 5432  #: the default Postgres database port
+
+
+class InvalidDbResult(NormanPgException):
+    """
+    Raised in response to an invalid result returned from the database.
+    """
 
 
 def _log_query(

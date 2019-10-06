@@ -6,9 +6,7 @@
 .. currentmodule:: normanpg.functions.srs
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 
-If you're dealing with
-`spatial reference systems <https://en.wikipedia.org/wiki/Spatial_reference_system>`_
-we have some functions for you.
+This module contains table-level functions.
 """
 from typing import Union
 from phrasebook import SqlPhrasebook
@@ -17,7 +15,7 @@ from psycopg2.sql import SQL, Literal
 from ..errors import NormanPgException
 from ..pg import connect, execute_rows, execute_scalar
 
-_phrasebook = SqlPhrasebook().load()
+_PHRASEBOOK = SqlPhrasebook().load()
 
 
 class InvalidSrsException(NormanPgException):
@@ -45,7 +43,7 @@ def table_exists(
         table_name: str,
         schema_name: str
 ) -> bool:
-    query = SQL(_phrasebook.gets('table_exists')).format(
+    query = SQL(_PHRASEBOOK.gets('table_exists')).format(
         table=Literal(table_name),
         schema=Literal(schema_name)
     )
@@ -57,7 +55,7 @@ def geometry_column(
         table_name: str,
         schema_name: str
 ) -> str or None:
-    query = SQL(_phrasebook.gets('geometry_column')).format(
+    query = SQL(_PHRASEBOOK.gets('geometry_column')).format(
         table=Literal(table_name),
         schema=Literal(schema_name)
     )
@@ -74,6 +72,7 @@ def srid(
         table_name: str,
         schema_name: str
 ) -> int:
+    # TODO: Is this check still necessary?
     # If we were passed a string...
     if isinstance(cnx, str):
         # ...create a connection...
@@ -98,7 +97,7 @@ def srid(
                 'No geometry column is associated with the specified table '
                 'and schema names.'
             )
-        query = SQL(_phrasebook.gets('srid')).format(
+        query = SQL(_PHRASEBOOK.gets('srid')).format(
             table=Literal(table_name),
             schema=Literal(schema_name),
             geomcol=Literal(_geometry_column)

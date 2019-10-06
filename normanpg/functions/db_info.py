@@ -1,0 +1,132 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Created by pat on 9/29/19
+"""
+.. currentmodule:: normanpg.functions.db
+.. moduleauthor:: Pat Blair <pblair@geo-comm.com>
+
+This module contains database-level functions.
+"""
+from typing import Union
+from urllib.parse import urlparse, ParseResult
+from phrasebook import SqlPhrasebook
+import psycopg2.extensions
+from psycopg2.sql import SQL, Literal
+from ..errors import NormanPgException
+from ..pg import (
+    connect, execute_rows, execute_scalar,
+    InvalidDbResult,
+    DEFAULT_ADMIN_DB, DEFAULT_PG_PORT
+)
+
+_PHRASEBOOK = SqlPhrasebook().load()
+
+
+def parse_dbname(url: str) -> str:
+    """
+    Parse the database name from a connection URL.
+
+    :param url: the URL
+    :return: the database name
+    """
+    db: ParseResult = urlparse(url)
+    dbname = db.path[1:]
+    return dbname
+
+
+def db_exists(
+        url: str,
+        dbname: str = None,
+        admindb: str = DEFAULT_ADMIN_DB
+) -> bool:
+    """
+    Does a given database on a Postgres instance exist?
+
+    :param url: the database URL
+    :param dbname: the name of the database to test
+    :param admindb: the name of an existing (presumably the main) database
+    :return: `True` if the database exists, otherwise `False`
+    """
+    # Figure out what database we're looking for.
+    _dbname = dbname if dbname else parse_dbname(url)
+
+    # Prepare the query.
+    query = SQL(_PHRASEBOOK.gets('select_db_count')).format(
+        dbname=Literal(_dbname)
+    )
+    # Create a connection to the administrative database.
+    with connect(url=url, dbname=admindb) as cnx:
+        # The query should return a count of the appearances of the database
+        # name in an index table.
+        count = execute_scalar(cnx=cnx, query=query)
+        try:
+            count = int(count)
+        except ValueError:
+            raise NormanPgException(
+                f'The database returned a non-integer response: {count}'
+            )
+        # If the count is more than 1, there is something wrong with the result
+        # (since it should be the number of databases with the given name).
+        if count > 1:
+            raise NormanPgException(
+                f'The database returned an unexpected result: {count}'
+            )
+        # If the name appeared exactly one (1) time, the database exists.
+        # Otherwise, it doesn't.
+        return count == 1
+
+
+
+# def create_db(
+#         url: str,
+#         dbname: str,
+#         admindb: str = DEFAULT_ADMIN_DB):
+#     """
+#     Create a database on a Postgres instance.
+#
+#     :param url: the Postgres instance URL
+#     :param dbname: the name of the database
+#     :param admindb: the name of an existing (presumably the main) database
+#     """
+#     try:
+#         with connect(url=url, dbname=admindb) as cnx:
+#             cnx.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+#             with cnx.cursor() as crs:
+#                 crs.execute(_sql_phrasebook.create_db.format(dbname))
+#     except (psycopg2.IntegrityError, exc.IntegrityError) as pex:
+#         # Let's examine the error coming back from trying to create the DB.
+#         err_msg = str(pex)
+#         if (
+#                 f'DETAIL:  Key (datname)=({dbname}) already exists' in err_msg
+#                 or pex.pgcode == 23505
+#         ):
+#             pass
+#         else:
+#             raise
+#
+#
+# def touch_db(
+#         url: str,
+#         dbname: str = None,
+#         admindb: str = DEFAULT_ADMIN_DB):
+#     """
+#     Create a database if it does not already exist.
+#
+#     :param url: the Postgres instance URL
+#     :param dbname: the name of the database
+#     :param admindb: the name of an existing (presumably the main) database
+#     """
+#     # If the database already exists, we don't need to do anything further.
+#     if db_exists(url=url, dbname=dbname, admindb=admindb):
+#         return
+#     # Let's see what we got for the database name.
+#     _dbname = dbname
+#     # If the caller didn't specify a database name...
+#     if not _dbname:
+#         # ...let's figure it out from the URL.
+#         db: ParseResult = urlparse(url)
+#         _dbname = db.path[1:]
+#
+#     # Now we can create it.
+#     create_db(url=url, dbname=_dbname, admindb=admindb)
