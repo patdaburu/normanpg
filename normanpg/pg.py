@@ -23,6 +23,22 @@ __logger__ = logging.getLogger(__name__)  #: the module logger
 DEFAULT_PG_PORT: int = 5432  #: the default Postgres database port
 
 
+def _log_query(
+        crs: psycopg2.extensions.cursor,
+        caller: str,
+        query: str or psycopg2.sql.Composed
+):
+    """
+    Log a SQL query.
+
+    :param crs: the execution cursor
+    :param caller: the caller
+    :param query: the query
+    """
+    query_str = query if isinstance(query, str) else query.as_string(crs)
+    __logger__.debug(f'[{caller}] {query_str}')
+
+
 def connect(
         url: str,
         dbname: str = None,
@@ -79,7 +95,7 @@ def _execute_scalar(
     """
     with cnx.cursor() as crs:
         # Log the query.
-        __logger__.debug(f'[{caller}] {query.as_string(crs)}')
+        _log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -139,7 +155,7 @@ def _execute_rows(
     """
     with cnx.cursor(cursor_factory=psycopg2.extras.DictCursor) as crs:
         # Log the query.
-        __logger__.debug(f'[{caller}] {query.as_string(crs)}')
+        _log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -200,7 +216,7 @@ def _execute(
     """
     with cnx.cursor() as crs:
         # Log the query.
-        __logger__.debug(f'[{caller}] {query.as_string(crs)}')
+        _log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
