@@ -8,8 +8,6 @@
 
 This module contains database-level functions.
 """
-import inspect
-from typing import Union
 from urllib.parse import urlparse, ParseResult
 from phrasebook import SqlPhrasebook
 import psycopg2.extensions
@@ -169,6 +167,33 @@ def create_schema(
     # Construct the query.
     query = SQL(_PHRASEBOOK.gets('create_schema')).format(
         schema=SQL(schema)
+    )
+    # Create the schema.
+    with connect(url=url, dbname=dbname) as cnx:
+        execute(cnx=cnx, query=query)
+
+
+def drop_schema(
+        url: str,
+        schema: str,
+        dbname: str = None,
+        cascade: bool = True
+):
+    """
+    Drop a schema in the database.
+
+    :param url: the database URL
+    :param schema: the name of the schema
+    :param dbname: the name of the database
+    :param cascade: ``True`` to drop the schema even if it is not empty,
+        otherwise the attempt fails
+    """
+    # Figure out what database we're looking for.
+    _dbname = dbname if dbname else parse_dbname(url)
+    # Construct the query.
+    query = SQL(_PHRASEBOOK.gets('drop_schema')).format(
+        schema=SQL(schema),
+        cascade=SQL('CASCADE' if cascade else 'RESTRICT')
     )
     # Create the schema.
     with connect(url=url, dbname=dbname) as cnx:

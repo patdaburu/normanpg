@@ -8,7 +8,7 @@
 
 Within this package are handy functions.
 """
-from .db_info import (
+from .database import (
     create_db,
     create_extension,
     create_schema,
@@ -16,4 +16,4 @@ from .db_info import (
     parse_dbname,
     touch_db
 )
-from .table_info import geometry_column, srid, table_exists
+from .tables import geometry_column, srid, table_exists
