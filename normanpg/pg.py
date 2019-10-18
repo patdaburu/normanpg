@@ -285,5 +285,4 @@ def compose_table(
             SQL(schema_name),
             SQL(table_name)
         )
-    else:
-        return SQL('{}').format(SQL(table_name))
+    return SQL('{}').format(SQL(table_name))

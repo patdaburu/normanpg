@@ -43,11 +43,18 @@ def table_exists(
         table_name: str,
         schema_name: str
 ) -> bool:
+    """
+
+    :param cnx: an open connection or database connection string
+    :param table_name: the name of the table
+    :param schema_name: the name of the schema in which the table resides
+    :return: ``True`` if the table exists, otherwise ``False``
+    """
     query = SQL(_PHRASEBOOK.gets('table_exists')).format(
         table=Literal(table_name),
         schema=Literal(schema_name)
     )
-    return execute_scalar(cnx=cnx,query=query)
+    return execute_scalar(cnx=cnx, query=query)
 
 
 def geometry_column(
@@ -55,6 +62,14 @@ def geometry_column(
         table_name: str,
         schema_name: str
 ) -> str or None:
+    """
+    Get the name of the geometry column in a feature table.
+
+    :param cnx: an open connection or database connection string
+    :param table_name: the name of the table
+    :param schema_name:
+    :return: the name of the geometry column
+    """
     query = SQL(_PHRASEBOOK.gets('geometry_column')).format(
         table=Literal(table_name),
         schema=Literal(schema_name)
@@ -72,8 +87,15 @@ def srid(
         table_name: str,
         schema_name: str
 ) -> int:
-    # TODO: Is this check still necessary?
-    # If we were passed a string...
+    """
+    Get the SRID for geometries in a feature table.
+
+    :param cnx: an open connection or database connection string
+    :param table_name: the name of the table
+    :param schema_name: the name of the schema in which the table resides
+    :return: the SRID for geometries in the table
+    """
+    # We need to make multiple database calls, so if we were passed a string...
     if isinstance(cnx, str):
         # ...create a connection...
         _cnx = connect(cnx)
@@ -92,7 +114,6 @@ def srid(
             schema_name=schema_name
         )
         if not _geometry_column:
-            # TODO: Consider checking if the table exists and raising a more specific error.
             raise NoGeometryColumn(
                 'No geometry column is associated with the specified table '
                 'and schema names.'

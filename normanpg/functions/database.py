@@ -15,9 +15,8 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2.sql import Literal, Identifier, SQL
 from ..errors import NormanPgException
 from ..pg import (
-    connect, execute, execute_rows, execute_scalar,
-    InvalidDbResult,
-    DEFAULT_ADMIN_DB, DEFAULT_PG_PORT
+    connect, execute, execute_scalar,
+    DEFAULT_ADMIN_DB
 )
 
 _PHRASEBOOK = SqlPhrasebook().load()
@@ -100,7 +99,7 @@ def create_db(
         cnx.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         try:
             execute(cnx=cnx, query=query)
-        except psycopg2.IntegrityError as pex:
+        except psycopg2.IntegrityError:
             raise
 
 
