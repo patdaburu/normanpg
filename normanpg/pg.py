@@ -16,14 +16,22 @@ import psycopg2.extras
 import psycopg2.sql
 from psycopg2.sql import SQL
 import psycopg2.extensions
+from .errors import NormanPgException
 
 
 __logger__ = logging.getLogger(__name__)  #: the module logger
 
+DEFAULT_ADMIN_DB = 'postgres'  #: the default administrative database name
 DEFAULT_PG_PORT: int = 5432  #: the default Postgres database port
 
 
-def _log_query(
+class InvalidDbResult(NormanPgException):
+    """
+    Raised in response to an invalid result returned from the database.
+    """
+
+
+def log_query(
         crs: psycopg2.extensions.cursor,
         caller: str,
         query: str or psycopg2.sql.Composed
@@ -95,7 +103,7 @@ def _execute_scalar(
     """
     with cnx.cursor() as crs:
         # Log the query.
-        _log_query(crs=crs, caller=caller, query=query)
+        log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -155,7 +163,7 @@ def _execute_rows(
     """
     with cnx.cursor(cursor_factory=psycopg2.extras.DictCursor) as crs:
         # Log the query.
-        _log_query(crs=crs, caller=caller, query=query)
+        log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -216,7 +224,7 @@ def _execute(
     """
     with cnx.cursor() as crs:
         # Log the query.
-        _log_query(crs=crs, caller=caller, query=query)
+        log_query(crs=crs, caller=caller, query=query)
         # Execute!
         try:
             crs.execute(query)
@@ -277,5 +285,4 @@ def compose_table(
             SQL(schema_name),
             SQL(table_name)
         )
-    else:
-        return SQL('{}').format(SQL(table_name))
+    return SQL('{}').format(SQL(table_name))

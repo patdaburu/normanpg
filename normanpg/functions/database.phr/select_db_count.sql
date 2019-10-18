@@ -1,0 +1,1 @@
+SELECT COUNT(datname) FROM pg_database WHERE datname={dbname}

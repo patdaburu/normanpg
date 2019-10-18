@@ -6,9 +6,7 @@
 .. currentmodule:: normanpg.functions.srs
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 
-If you're dealing with
-`spatial reference systems <https://en.wikipedia.org/wiki/Spatial_reference_system>`_
-we have some functions for you.
+This module contains table-level functions.
 """
 from typing import Union
 from phrasebook import SqlPhrasebook
@@ -17,7 +15,7 @@ from psycopg2.sql import SQL, Literal
 from ..errors import NormanPgException
 from ..pg import connect, execute_rows, execute_scalar
 
-_phrasebook = SqlPhrasebook().load()
+_PHRASEBOOK = SqlPhrasebook().load()
 
 
 class InvalidSrsException(NormanPgException):
@@ -45,11 +43,18 @@ def table_exists(
         table_name: str,
         schema_name: str
 ) -> bool:
-    query = SQL(_phrasebook.gets('table_exists')).format(
+    """
+
+    :param cnx: an open connection or database connection string
+    :param table_name: the name of the table
+    :param schema_name: the name of the schema in which the table resides
+    :return: ``True`` if the table exists, otherwise ``False``
+    """
+    query = SQL(_PHRASEBOOK.gets('table_exists')).format(
         table=Literal(table_name),
         schema=Literal(schema_name)
     )
-    return execute_scalar(cnx=cnx,query=query)
+    return execute_scalar(cnx=cnx, query=query)
 
 
 def geometry_column(
@@ -57,7 +62,15 @@ def geometry_column(
         table_name: str,
         schema_name: str
 ) -> str or None:
-    query = SQL(_phrasebook.gets('geometry_column')).format(
+    """
+    Get the name of the geometry column in a feature table.
+
+    :param cnx: an open connection or database connection string
+    :param table_name: the name of the table
+    :param schema_name:
+    :return: the name of the geometry column
+    """
+    query = SQL(_PHRASEBOOK.gets('geometry_column')).format(
         table=Literal(table_name),
         schema=Literal(schema_name)
     )
@@ -74,7 +87,15 @@ def srid(
         table_name: str,
         schema_name: str
 ) -> int:
-    # If we were passed a string...
+    """
+    Get the SRID for geometries in a feature table.
+
+    :param cnx: an open connection or database connection string
+    :param table_name: the name of the table
+    :param schema_name: the name of the schema in which the table resides
+    :return: the SRID for geometries in the table
+    """
+    # We need to make multiple database calls, so if we were passed a string...
     if isinstance(cnx, str):
         # ...create a connection...
         _cnx = connect(cnx)
@@ -93,12 +114,11 @@ def srid(
             schema_name=schema_name
         )
         if not _geometry_column:
-            # TODO: Consider checking if the table exists and raising a more specific error.
             raise NoGeometryColumn(
                 'No geometry column is associated with the specified table '
                 'and schema names.'
             )
-        query = SQL(_phrasebook.gets('srid')).format(
+        query = SQL(_PHRASEBOOK.gets('srid')).format(
             table=Literal(table_name),
             schema=Literal(schema_name),
             geomcol=Literal(_geometry_column)
