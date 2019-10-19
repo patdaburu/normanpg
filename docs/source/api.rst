@@ -19,6 +19,22 @@ normanpg.errors
     :undoc-members:
     :show-inheritance:
 
+normanpg.functions.database
+---------------------------
+
+.. automodule:: normanpg.functions.database
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+normanpg.functions.tables
+-------------------------
+
+.. automodule:: normanpg.functions.tables
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 normanpg.geometry
 -----------------
 
