@@ -299,7 +299,7 @@ class TempSchema:
         """
         Get the database URL.
         """
-        return self.url
+        return self._url
 
     @property
     def prefix(self) -> str:
@@ -319,5 +319,5 @@ class TempSchema:
         create_schema(url=self.url, schema=self._schema_name)
         return self
 
-    def __exit__(self):
+    def __exit__(self, type, value, traceback):
         drop_schema(url=self.url, schema=self._schema_name)
