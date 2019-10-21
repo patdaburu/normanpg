@@ -14,6 +14,7 @@ from .database import (
     create_schema,
     db_exists,
     parse_dbname,
+    TempSchema,
     touch_db
 )
 from .tables import geometry_column, srid, table_exists
