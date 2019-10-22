@@ -1,1 +1,1 @@
-DROP SCHEMA IF NOT EXISTS {schema} {cascade}
+DROP SCHEMA IF EXISTS {schema} {cascade}

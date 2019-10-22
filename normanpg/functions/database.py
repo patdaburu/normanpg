@@ -8,6 +8,8 @@
 
 This module contains database-level functions.
 """
+import random
+import string
 from urllib.parse import urlparse, ParseResult
 from phrasebook import SqlPhrasebook
 import psycopg2.extensions
@@ -197,3 +199,125 @@ def drop_schema(
     # Create the schema.
     with connect(url=url, dbname=dbname) as cnx:
         execute(cnx=cnx, query=query)
+
+
+def schema_exists(
+        url: str,
+        schema: str = None,
+        dbname: str = None,
+) -> bool:
+    """
+    Does a given schema exist within a database?
+
+    :param url: the database URL
+    :param schema: the name of the database to test
+    :param dbname: the name of the database
+    :return: `True` if the schema exists, otherwise `False`
+    """
+    # Figure out what database we're looking for.
+    _dbname = dbname if dbname else parse_dbname(url)
+
+    # Prepare the query.
+    query = SQL(_PHRASEBOOK.gets('schema_exists')).format(
+        schema=Literal(schema)
+    )
+    # Create a connection to the administrative database.
+    with connect(url=url, dbname=_dbname) as cnx:
+        # The query should return a count of the appearances of the database
+        # name in an index table.
+        count = execute_scalar(cnx=cnx, query=query)
+        try:
+            count = int(count)
+        except ValueError:
+            raise NormanPgException(
+                f'The database returned a non-integer response: {count}'
+            )
+        # If the count is more than 1, there is something wrong with the result
+        # (since it should be the number of databases with the given name).
+        if count > 1:
+            raise NormanPgException(
+                f'The database returned an unexpected result: {count}'
+            )
+        # If the name appeared exactly one (1) time, the database exists.
+        # Otherwise, it doesn't.
+        return count == 1
+
+
+def temp_name(rand: int = 8, prefix: str = None):
+    """
+    Generate a randomized of a specified length and an optional prefix.
+
+    :param rand: the number of random characters in the name
+    :param prefix: the prefix
+    :return: the randomized name
+    """
+    # Negative numbers don't make sense in this context.
+    if rand < 0:
+        raise ValueError("The random factor may not be less than zero (0).")
+    # We would like some sane amount of information from which to format a
+    # name.
+    if rand < 3:
+        if prefix and prefix.strip():
+            return prefix
+        else:
+            raise ValueError(
+                "The name must include a random factor of at least three (3) "
+                "characters or a prefix."
+            )
+    # Construct the randomized part of the string.
+    chars = ''.join(random.choice(string.ascii_lowercase) for i in range(rand))
+    # Based on whether or not there is a prefix, construct and return a new
+    # name.
+    return (
+        f"{prefix}_{chars}"
+        if prefix
+        else chars
+    ).strip()
+
+
+class TempSchema:
+    def __init__(
+            self,
+            url: str,
+            rand: int = 8,
+            prefix: str = None
+    ):
+        """
+        This is a context manager you can use to create a temporary schema.
+
+        :param url: the database URL
+        :param rand: the number of random characters to place in the name
+        :param prefix: the name prefix
+        """
+        self._url = url
+        self._prefix = prefix
+        # TODO: Make sure the names don't clash.
+        self._schema_name = temp_name(rand=rand, prefix=prefix)
+
+    @property
+    def url(self) -> str:
+        """
+        Get the database URL.
+        """
+        return self._url
+
+    @property
+    def prefix(self) -> str:
+        """
+        Get the prefix.
+        """
+        return self._prefix
+
+    @property
+    def schema_name(self) -> str:
+        """
+        Get the schema name.
+        """
+        return self._schema_name
+
+    def __enter__(self):
+        create_schema(url=self.url, schema=self._schema_name)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        drop_schema(url=self.url, schema=self._schema_name)
