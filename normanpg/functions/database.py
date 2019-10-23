@@ -276,6 +276,9 @@ def temp_name(rand: int = 8, prefix: str = None):
 
 
 class TempSchema:
+    """
+    This is a context manager you can use to create a temporary schema.
+    """
     def __init__(
             self,
             url: str,
@@ -291,7 +294,7 @@ class TempSchema:
         """
         self._url = url
         self._prefix = prefix
-        # TODO: Make sure the names don't clash.
+        # Note to the future: Make sure the names don't clash.
         self._schema_name = temp_name(rand=rand, prefix=prefix)
 
     @property
@@ -319,5 +322,5 @@ class TempSchema:
         create_schema(url=self.url, schema=self._schema_name)
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, type_, value, traceback):
         drop_schema(url=self.url, schema=self._schema_name)
