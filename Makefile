@@ -27,7 +27,7 @@ freeze:
 	pip freeze > requirements.txt
 
 lint:
-	pylint $(PROJ_SLUG)
+	flake8 $(PROJ_SLUG)
 
 test: lint
 	py.test --cov-report term --cov=$(PROJ_SLUG) tests/

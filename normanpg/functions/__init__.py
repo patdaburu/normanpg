@@ -3,10 +3,10 @@
 
 # Created by pat on 9/29/19
 """
+Within this package are handy functions.
+
 .. currentmodule:: normanpg.functions
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
-
-Within this package are handy functions.
 """
 from .database import (
     create_db,
