@@ -50,3 +50,11 @@ normanpg.pg
     :members:
     :undoc-members:
     :show-inheritance:
+
+normanpg.shemas
+---------------
+
+.. automodule:: normanpg.schemas
+    :members:
+    :undoc-members:
+    :show-inheritance:

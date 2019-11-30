@@ -3,10 +3,10 @@
 
 # Created on 9/22/19 by pat
 """
+This module contains conveniences for working with geometries.
+
 .. currentmodule:: normanpg.geometry
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
-
-This module contains conveniences for working with geometries.
 """
 from shapely.geometry.base import BaseGeometry
 from shapely import wkb
