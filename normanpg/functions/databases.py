@@ -8,8 +8,6 @@
 
 This module contains database-level functions.
 """
-import random
-import string
 from urllib.parse import urlparse, ParseResult
 from phrasebook import SqlPhrasebook
 import psycopg2.extensions
@@ -149,95 +147,3 @@ def touch_db(
 
     # Now we can create it.
     create_db(url=url, dbname=_dbname, admindb=admindb)
-
-
-def create_schema(
-        url: str,
-        schema: str,
-        dbname: str = None
-):
-    """
-    Create a schema in the database.
-
-    :param url: the database URL
-    :param schema: the name of the schema
-    :param dbname: the name of the database
-    """
-    # Figure out what database we're looking for.
-    _dbname = dbname if dbname else parse_dbname(url)
-    # Construct the query.
-    query = SQL(_PHRASEBOOK.gets('create_schema')).format(
-        schema=SQL(schema)
-    )
-    # Create the schema.
-    with connect(url=url, dbname=dbname) as cnx:
-        execute(cnx=cnx, query=query)
-
-
-def drop_schema(
-        url: str,
-        schema: str,
-        dbname: str = None,
-        cascade: bool = True
-):
-    """
-    Drop a schema in the database.
-
-    :param url: the database URL
-    :param schema: the name of the schema
-    :param dbname: the name of the database
-    :param cascade: ``True`` to drop the schema even if it is not empty,
-        otherwise the attempt fails
-    """
-    # Figure out what database we're looking for.
-    _dbname = dbname if dbname else parse_dbname(url)
-    # Construct the query.
-    query = SQL(_PHRASEBOOK.gets('drop_schema')).format(
-        schema=SQL(schema),
-        cascade=SQL('CASCADE' if cascade else 'RESTRICT')
-    )
-    # Create the schema.
-    with connect(url=url, dbname=dbname) as cnx:
-        execute(cnx=cnx, query=query)
-
-
-def schema_exists(
-        url: str,
-        schema: str = None,
-        dbname: str = None,
-) -> bool:
-    """
-    Does a given schema exist within a database?
-
-    :param url: the database URL
-    :param schema: the name of the database to test
-    :param dbname: the name of the database
-    :return: `True` if the schema exists, otherwise `False`
-    """
-    # Figure out what database we're looking for.
-    _dbname = dbname if dbname else parse_dbname(url)
-
-    # Prepare the query.
-    query = SQL(_PHRASEBOOK.gets('schema_exists')).format(
-        schema=Literal(schema)
-    )
-    # Create a connection to the administrative database.
-    with connect(url=url, dbname=_dbname) as cnx:
-        # The query should return a count of the appearances of the database
-        # name in an index table.
-        count = execute_scalar(cnx=cnx, query=query)
-        try:
-            count = int(count)
-        except ValueError:
-            raise NormanPgException(
-                f'The database returned a non-integer response: {count}'
-            )
-        # If the count is more than 1, there is something wrong with the result
-        # (since it should be the number of databases with the given name).
-        if count > 1:
-            raise NormanPgException(
-                f'The database returned an unexpected result: {count}'
-            )
-        # If the name appeared exactly one (1) time, the database exists.
-        # Otherwise, it doesn't.
-        return count == 1
