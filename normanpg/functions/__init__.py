@@ -8,7 +8,7 @@ Within this package are handy functions.
 .. currentmodule:: normanpg.functions
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 """
-from .databases import (
+from .database import (
     create_db,
     create_extension,
     db_exists,

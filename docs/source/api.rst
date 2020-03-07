@@ -27,6 +27,14 @@ normanpg.functions.database
     :undoc-members:
     :show-inheritance:
 
+normanpg.functions.schemas
+--------------------------
+
+.. automodule:: normanpg.functions.schemas
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 normanpg.functions.tables
 -------------------------
 
@@ -47,14 +55,6 @@ normanpg.pg
 -----------
 
 .. automodule:: normanpg.pg
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-normanpg.shemas
----------------
-
-.. automodule:: normanpg.schemas
     :members:
     :undoc-members:
     :show-inheritance:
