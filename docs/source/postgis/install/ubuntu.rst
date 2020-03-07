@@ -6,14 +6,53 @@ Installing PostgreSQL and PostGIS on Ubuntu
 # TODO: Reference THIS...
 https://kitcharoenp.github.io/postgresql/postgis/2018/05/28/set_up_postgreSQL_postgis.html
 
+You can use the UbuntuGIS.
+
+
+
 Add the Repository
 ------------------
 
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main" >> /etc/apt/sources.list'
+We'll start by adding the `UbuntuGIS <https://wiki.ubuntu.com/UbuntuGIS>`_
+repository.
+
+Verify Your Ubuntu Version
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In this example we're using
+`Ubuntu 18.04 LTS <http://releases.ubuntu.com/18.04/>`_, but if you're
+using another version you may need the release codename.  You can get it
+using ``lsb_release``.
+
+.. code-block:: sh
+
+    $ sudo lsb_release -a
+
+.. code-block:: coq
+    :emphasize-lines: 5
+
+    No LSB modules are available.
+    Distributor ID:	Ubuntu
+    Description:	Ubuntu 18.04 LTS
+    Release:	18.04
+    Codename:	bionic
+
+Add the Repository to ``sources.list``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In this example, the release code name is *"bionic"*.  If you're using another
+release, replace *bionic* with the release code name.
+
+.. code-block::
+
+    sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bionic-pgdg main" >> /etc/apt/sources.list'
 
 
 Add the Keys
-------------
+^^^^^^^^^^^^
+
+Use ``apt-keys`` to add the key used by apt to authenticate packages from the
+repository.
 
 .. code-block:: sh
 
