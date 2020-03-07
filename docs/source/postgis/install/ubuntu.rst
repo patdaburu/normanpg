@@ -3,12 +3,8 @@
 Installing PostgreSQL and PostGIS on Ubuntu
 ===========================================
 
-# TODO: Reference THIS...
-https://kitcharoenp.github.io/postgresql/postgis/2018/05/28/set_up_postgreSQL_postgis.html
-
-You can use the UbuntuGIS.
-
-
+Follow the steps below to install `PostgreSQL <https://www.postgresql.org/>`_
+and `PostGIS <http://postgis.org/>`_ on `Ubuntu <https://www.ubuntu.com/>`_
 
 Add the Repository
 ------------------
