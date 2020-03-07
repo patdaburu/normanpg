@@ -3,8 +3,8 @@
 
 # Created by pat on 9/29/19
 """
-.. currentmodule:: normanpg.functions.db
-.. moduleauthor:: Pat Blair <pblair@geo-comm.com>
+.. currentmodule:: normanpg.functions.database
+.. moduleauthor:: Pat Blair <pat@daburu.net>
 
 This module contains database-level functions.
 """
