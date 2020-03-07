@@ -10,6 +10,7 @@ This module contains the basic PostgreSQL functions.
 """
 import inspect
 import logging
+import os
 from typing import Any, Callable, Iterable, Union
 from urllib.parse import urlparse, ParseResult
 import psycopg2.extras
@@ -21,8 +22,14 @@ from .errors import NormanPgException
 
 __logger__ = logging.getLogger(__name__)  #: the module logger
 
-DEFAULT_ADMIN_DB = 'postgres'  #: the default administrative database name
-DEFAULT_PG_PORT: int = 5432  #: the default Postgres database port
+DEFAULT_ADMIN_DB = os.environ.get(
+    'DEFAULT_ADMIN_DB',
+    'postgres'
+)  #: the default administrative database name
+DEFAULT_PG_PORT: int = int(os.environ.get(
+    'DEFAULT_PG_PORT',
+    5432)
+)  #: the default Postgres database port
 
 
 class InvalidDbResult(NormanPgException):
