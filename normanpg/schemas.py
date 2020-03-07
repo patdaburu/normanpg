@@ -83,9 +83,9 @@ class TempSchema:
 
     def __enter__(self):
         """Enter the context."""
-        create_schema(url=self.url, schema=self._schema_name)
+        create_schema(cnx=self.url, schema=self._schema_name)
         return self
 
     def __exit__(self, type_, value, traceback):
         """Exit the context."""
-        drop_schema(url=self.url, schema=self._schema_name)
+        drop_schema(cnx=self.url, schema=self._schema_name)

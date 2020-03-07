@@ -259,7 +259,7 @@ def execute(
             try:
                 crs.execute(query)
             except SyntaxError:
-                logging.exception(query.as_string(crs))
+                logging.exception(query.as_string(query))
                 raise
 
     # If the caller passed us a connection string...
@@ -267,9 +267,10 @@ def execute(
         # ...get a connection and use the helper method to execute the query.
         with connect(url=cnx) as _cnx:
             _execute(ocnx=_cnx)
-    # It looks as though we were given an open connection, so execute the
-    # query on it.
-    _execute(ocnx=cnx)
+    else:
+        # It looks as though we were given an open connection, so execute the
+        # query on it.
+        _execute(ocnx=cnx)
 
 
 def compose_table(

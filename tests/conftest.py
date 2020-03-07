@@ -11,7 +11,7 @@ class TmpDb(NamedTuple):
     dburl: str  #: the database URL
 
 
-@pytest.yield_fixture(scope='module', name='tmp_db')
+@pytest.yield_fixture(scope='session', name='tmp_db')
 def tmp_db():
     """
     Generates a temporal database using the testing.postgresql package
