@@ -123,19 +123,19 @@ def execute_scalar(
             ocnx: psycopg2.extensions.connection,
     ) -> Any:
         """
-        Executes a query on an open cursor.
+        Execute a query on an open cursor.
 
         :param ocnx: an open connection database connection
         :return: the first value in the first row returned by the query
         """
         with ocnx.cursor() as crs:
             # Log the query.
-            log_query(crs=crs, caller=caller, query=query)
+            log_query(crs=crs, caller=caller, query=_query)
             # Execute!
             try:
                 crs.execute(query)
             except SyntaxError:
-                logging.exception(query.as_string(crs))
+                logging.exception(_query.as_string(crs))
                 raise
             # Get the first column from the first result.
             return crs.fetchone()[0]
@@ -194,12 +194,12 @@ def execute_rows(
         """
         with ocnx.cursor(cursor_factory=psycopg2.extras.DictCursor) as crs:
             # Log the query.
-            log_query(crs=crs, caller=caller, query=query)
+            log_query(crs=crs, caller=caller, query=_query)
             # Execute!
             try:
                 crs.execute(query)
             except SyntaxError:
-                logging.exception(query.as_string(crs))
+                logging.exception(_query.as_string(crs))
                 raise
             # Fetch the rows and yield them to the caller.
             for _row in crs:
