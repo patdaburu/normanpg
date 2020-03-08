@@ -36,14 +36,3 @@ def test_verbose_output():
     result: Result = runner.invoke(cli.cli, ['-v', 'version'])
     assert 'Verbose' in result.output.strip(), \
         'Verbose logging should be indicated in output.'
-
-
-def test_hello_displays_expected_message():
-    """
-    Arrange/Act: Run the `version` subcommand.
-    Assert:  The output matches the library version.
-    """
-    runner: CliRunner = CliRunner()
-    result: Result = runner.invoke(cli.cli, ['hello'])
-    assert 'normanpg' in result.output.strip(), \
-        "'Hello' messages should contain the CLI name."

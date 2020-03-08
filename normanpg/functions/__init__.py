@@ -21,3 +21,17 @@ from .schemas import (
     schema_exists
 )
 from .tables import geometry_column, srid, table_exists
+
+__all__ = [
+    'create_db',
+    'create_extension',
+    'db_exists',
+    'parse_dbname',
+    'touch_db',
+    'create_schema',
+    'drop_schema',
+    'schema_exists',
+    'geometry_column',
+    'srid',
+    'table_exists'
+]

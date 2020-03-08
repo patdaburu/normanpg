@@ -20,8 +20,6 @@ import psycopg2.extensions
 from .errors import NormanPgException
 
 
-__logger__ = logging.getLogger(__name__)  #: the module logger
-
 DEFAULT_ADMIN_DB = os.environ.get(
     'DEFAULT_ADMIN_DB',
     'postgres'
@@ -49,7 +47,7 @@ def log_query(
     :param query: the query
     """
     query_str = query if isinstance(query, str) else query.as_string(crs)
-    __logger__.debug(f'[{caller}] {query_str}')
+    logging.getLogger(__name__).debug(f'[{caller}] {query_str}')
 
 
 def connect(
@@ -248,7 +246,7 @@ def execute(
             ocnx: psycopg2.extensions.connection
     ):
         """
-        Executes a query on an open cursor.
+        Execute a query on an open cursor.
 
         :param ocnx: an open connection or database connection string
         """

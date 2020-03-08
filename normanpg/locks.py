@@ -26,11 +26,13 @@ class NormanPgLockException(NormanPgException):
 
 class LockModes(Enum):
     """PostgreSQL lock modes."""
+
     ACCESS_EXCLUSIVE = 'ACCESS EXCLUSIVE'
 
 
 class LockInfo(NamedTuple):
     """Table lock information."""
+
     table: str  #: the name of the table
     schema: str  #: the schema in which the table resides
     pid: int  #: the ID of the process that holds the lock
@@ -44,6 +46,7 @@ def lock_table(
         nowait: bool = False
 ):
     """
+    Lock a table.
 
     :param cnx: a connection string or open database connection
     :param table_name: the table name
@@ -95,7 +98,7 @@ def is_locked(
     schema_name: str,
 ) -> bool:
     """
-    Does that table have locks on it?
+    See if a table has locks on it.
 
     :param cnx: a connection string or open database connection
     :param table_name: the name of the table

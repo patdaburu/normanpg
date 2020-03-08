@@ -2,20 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """
+Entry point for the command-line interface (CLI) application.
+
 .. currentmodule:: normanpg.cli
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
-
-This is the entry point for the command-line interface (CLI) application.  It
-can be used as a handy facility for running the task from a command line.
 
 .. note::
 
     To learn more about Click visit the
     `project website <http://click.pocoo.org/5/>`_.  There is also a very
     helpful `tutorial video <https://www.youtube.com/watch?v=kNke39OZ2k0>`_.
-
-    To learn more about running Luigi, visit the Luigi project's
-    `Read-The-Docs <http://luigi.readthedocs.io/en/stable/>`_ page.
 """
 import logging
 import click
@@ -31,10 +27,11 @@ LOGGING_LEVELS = {
 
 
 class Info(object):
-    """
-    This is an information object that can be used to pass data between CLI functions.
-    """
-    def __init__(self):  # Note that this object must have an empty constructor.
+    """Information object for CLI functions."""
+
+    # NOTE:  This object must have an empty constructor!
+    def __init__(self):
+        """Create a new instance."""
         self.verbose: int = 0
 
 
@@ -53,9 +50,7 @@ pass_info = click.make_pass_decorator(
 @pass_info
 def cli(info: Info,
         verbose: int):
-    """
-    Run normanpg.
-    """
+    """Run ``normanpg``."""
     # Use the verbosity count to determine the logging level...
     if verbose > 0:
         logging.basicConfig(
@@ -72,18 +67,8 @@ def cli(info: Info,
         )
     info.verbose = verbose
 
-@cli.command()
-@pass_info
-def hello(_: Info):
-    """
-    Say 'hello' to the nice people.
-    """
-    click.echo(f"normanpg says 'hello'")
-
 
 @cli.command()
 def version():
-    """
-    Get the library version.
-    """
+    """Get the library version."""
     click.echo(click.style(f'{__version__}', bold=True))
