@@ -1,0 +1,1 @@
+LOCK {table} IN {mode} MODE {nowait}
