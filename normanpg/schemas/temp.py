@@ -3,14 +3,14 @@
 
 # Created by pat on 11/30/19
 """
-This module contains conveniences for working with database schemas.
+Create temporary schemas.
 
-.. currentmodule:: normanpg.schemas
+.. currentmodule:: normanpg.schemas.temp
 .. moduleauthor:: Pat Daburu <pat@daburu.net>
 """
 import random
 import string
-from .functions import create_schema, drop_schema
+from normanpg.functions import create_schema, drop_schema
 
 
 def temp_name(rand: int = 8, prefix: str = None):
