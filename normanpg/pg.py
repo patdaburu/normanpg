@@ -133,7 +133,7 @@ def execute_scalar(
             log_query(crs=crs, caller=caller, query=_query)
             # Execute!
             try:
-                crs.execute(query)
+                crs.execute(_query)
             except SyntaxError:
                 logging.exception(_query.as_string(crs))
                 raise
@@ -186,8 +186,7 @@ def execute_rows(
             ocnx: psycopg2.extensions.connection,
     ) -> Iterable[psycopg2.extras.DictRow]:
         """
-        This is a helper function for :py:func:`execute_rows` that executes a
-        query on an open cursor.
+        Execute ``_query`` on an open cursor.
 
         :param ocnx: an open database connection
         :return: an iteration of `DictRow` instances representing the rows
@@ -197,7 +196,7 @@ def execute_rows(
             log_query(crs=crs, caller=caller, query=_query)
             # Execute!
             try:
-                crs.execute(query)
+                crs.execute(_query)
             except SyntaxError:
                 logging.exception(_query.as_string(crs))
                 raise
@@ -255,12 +254,12 @@ def execute(
         """
         with ocnx.cursor() as crs:
             # Log the query.
-            log_query(crs=crs, caller=caller, query=query)
+            log_query(crs=crs, caller=caller, query=_query)
             # Execute!
             try:
-                crs.execute(query)
+                crs.execute(_query)
             except SyntaxError:
-                logging.exception(query.as_string(query))
+                logging.exception(query.as_string(_query))
                 raise
 
     # If the caller passed us a connection string...
