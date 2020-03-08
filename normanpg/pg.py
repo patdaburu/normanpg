@@ -211,10 +211,11 @@ def execute_rows(
         with connect(url=cnx) as _cnx:
             for row in _execute_rows(ocnx=_cnx):
                 yield row
-    # It looks as though we were given an open connection, so execute the
-    # query on it.
-    for row in _execute_rows(ocnx=cnx):
-        yield row
+    else:
+        # It looks as though we were given an open connection, so execute the
+        # query on it.
+        for row in _execute_rows(ocnx=cnx):
+            yield row
 
 
 def execute(

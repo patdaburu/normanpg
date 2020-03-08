@@ -10,8 +10,8 @@ FROM
 WHERE
 	l.relation=t.relid
 	AND
-	t.relname='{table}'
+	t.relname={table}
 	AND
-	t.schemaname='{schema}'
+	t.schemaname={schema}
 ORDER BY
 	relation ASC;
